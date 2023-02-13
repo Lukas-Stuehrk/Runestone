@@ -434,6 +434,33 @@ open class TextView: NSView, NSMenuItemValidation {
         }
     }
 
+    /// Returns the character location at the specified row and column.
+    /// - Parameter textLocation: The row and column in the text.
+    /// - Returns: The location if the input row and column could be found in the text, otherwise nil.
+    public func location(at textLocation: TextLocation) -> Int? {
+        let lineIndex = textLocation.lineNumber
+        guard lineIndex >= 0 && lineIndex < textViewController.lineManager.lineCount else {
+            return nil
+        }
+        let line = textViewController.lineManager.line(atRow: lineIndex)
+        guard textLocation.column >= 0 && textLocation.column <= line.data.totalLength else {
+            return nil
+        }
+        return line.location + textLocation.column
+    }
+
+    /// Returns the row and column at the specified location in the text.
+    /// Common usages of this includes showing the line and column that the caret is currently located at.
+    /// - Parameter location: The location is relative to the first index in the string.
+    /// - Returns: The text location if the input location could be found in the string, otherwise nil.
+    public func textLocation(at location: Int) -> TextLocation? {
+        if let linePosition = textViewController.lineManager.linePosition(at: location) {
+            return TextLocation(linePosition)
+        } else {
+            return nil
+        }
+    }
+
     public init() {
         super.init(frame: .zero)
         textViewController.delegate = self
@@ -970,6 +997,8 @@ extension TextView: TextViewControllerDelegate {
         updateCaretFrame()
         updateSelectedRectangles()
         scrollToVisibleLocationIfNeeded()
+
+        editorDelegate?.textViewDidChangeSelection(self)
     }
 }
 #endif

@@ -7,6 +7,11 @@ public struct TextLocation: Hashable, Equatable {
     /// Column in the line.
     public let column: Int
 
+    public init(lineNumber: Int, column: Int) {
+        self.lineNumber = lineNumber
+        self.column = column
+    }
+
     init(_ linePosition: LinePosition) {
         self.lineNumber = linePosition.row
         self.column = linePosition.column
